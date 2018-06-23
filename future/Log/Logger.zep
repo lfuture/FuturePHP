@@ -3,6 +3,7 @@ namespace Future\Log;
 use Future\Log\Adapter\AdapterInterface;
 use Future\Log\Level;
 use Future\Log\Exception;
+use Future\Log\Message;
 
 class Logger
 {
@@ -76,53 +77,66 @@ class Logger
         return this->processors;
     }
 
-    public function log(int! level, var message, array! context = []) -> <AdapterInterface>
+    public function log(int! level, var message, array! context = []) -> <Logger>
     {
-        return this->write(level, message, microtime(true), context);
+        this->write(level, message, microtime(true), context);
+        return this;
     }
 
-    public function debug(var message, array! context = []) -> <AdapterInterface>
+    public function debug(var message, array! context = []) -> <Logger>
     {
-        return this->write(Level::DEBUG, message, microtime(true), context);
+        this->write(Level::DEBUG, message, microtime(true), context);
+        return this;
     }
 
-    public function error(var message, array! context = []) -> <AdapterInterface>
+    public function error(var message, array! context = []) -> <Logger>
     {
-        return this->write(Level::ERROR, message, microtime(true), context);
+        this->write(Level::ERROR, message, microtime(true), context);
+        return this;
     }
 
-    public function info(var message, array! context = []) -> <AdapterInterface>
+    public function info(var message, array! context = []) -> <Logger>
     {
-        return this->write(Level::DEBUG, message, microtime(true), context);
+        this->write(Level::INFO, message, microtime(true), context);
+        return this;
     }
 
-    public function notice(var message, array! context = []) -> <AdapterInterface>
+    public function notice(var message, array! context = []) -> <Logger>
     {
-        return this->write(Level::DEBUG, message, microtime(true), context);
+        this->write(Level::DEBUG, message, microtime(true), context);
+        return this;
     }
 
-    public function warning(var message, array! context = []) -> <AdapterInterface>
+    public function warning(var message, array! context = []) -> <Logger>
     {
-        return this->write(Level::WARNING, message, microtime(true), context);
+        this->write(Level::WARNING, message, microtime(true), context);
+        return this;
     }
 
-    public function alert(var message, array! context = []) -> <AdapterInterface>
+    public function alert(var message, array! context = []) -> <Logger>
     {
-        return this->write(Level::ALERT, message, microtime(true), context);
+        this->write(Level::ALERT, message, microtime(true), context);
+        return this;
     }
 
-    public function critical(var message, array! context = []) -> <AdapterInterface>
+    public function critical(var message, array! context = []) -> <Logger>
     {
-        return this->write(Level::CRITICAL, message, microtime(true), context);
+        this->write(Level::CRITICAL, message, microtime(true), context);
+        return this;
     }
 
-    public function emergency(var message, array! context = []) -> <AdapterInterface>
+    public function emergency(var message, array! context = []) -> <Logger>
     {
-        return this->write(Level::EMERGENCY, message, microtime(true), context);
+        this->write(Level::EMERGENCY, message, microtime(true), context);
+        return this;
     }
 
     protected function write(int! level, var messageString, float! time, array! context, array! extra = [])
     {
+        if this->transaction {
+            let this->queue[] = new Message(level, messageString, time, context, extra);
+            return;
+        }
         var adapter, processor, levelName = Level::getLevelName(level);
         var message = [
             "message":messageString,
@@ -141,8 +155,6 @@ class Logger
         for adapter in this->adapters {
             call_user_func([adapter, "handle"], message);
         }
-
-        return true;
     }
 
     public function begin() -> <AdapterInterface>

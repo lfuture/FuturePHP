@@ -29,8 +29,37 @@ class LoggerTest extends TestCase
             "type" => "single"
         ]);
         $fileContent = file_get_contents($filePath);
-        $logReg = "/\] \[DEBUG\] Test single adapter FileAdapter\n$/";
+        $logReg = "/\] \[INFO\] Test single adapter FileAdapter\n$/";
         $this->assertEquals(1, preg_match($logReg, $fileContent));
+        unlink($filePath);
+    }
+
+    public function testTransaction()
+    {
+        $filePath = "/tmp/transaction" . microtime(true) . ".log";
+
+        $logger = new Logger("test");
+        $adapter = new FileAdapter($filePath);
+        $logger->pushAdapter($adapter);
+        $logger->begin();
+
+        $this->assertTrue($logger->isTransaction());
+
+        $logger->info("Test log of {type}", [
+            "type" => "transaction1"
+        ]);
+        $logger->error("Test log of {type}", [
+            "type" => "transaction2"
+        ]);
+        $logger->debug("Test log of {type}", [
+            "type" => "transaction3"
+        ]);
+
+        $this->assertFalse(file_exists($filePath));
+        $logger->commit();
+        $this->assertTrue(file_exists($filePath));
+        $fileContent = file_get_contents($filePath);
+
         unlink($filePath);
     }
 }

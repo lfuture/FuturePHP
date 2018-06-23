@@ -10,5 +10,4 @@ class LevelTest extends TestCase
     {
         $this->assertTrue(class_exists("Future\\Log\\Level"));
     }
-
 }

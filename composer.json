@@ -1,0 +1,12 @@
+{
+    "name": "futurephp/tests",
+    "authors": [
+        {
+            "name": "lfuture",
+            "email": "ln6265431@163.com"
+        }
+    ],
+    "require": {
+        "phpunit/phpunit": "^7.2"
+    }
+}

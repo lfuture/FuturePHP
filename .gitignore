@@ -1,0 +1,6 @@
+.idea
+.temp
+vendor
+compile-errors.log
+compile.log
+ext
